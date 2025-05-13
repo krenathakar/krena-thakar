@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Website</title>
+    <style>
+        body {
+            background-image: url('images/property/rshmpg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        /* Add semi-transparent background to content areas */
+        .filters {
+            background-color: rgba(244, 244, 244, 0.9);
+        }
+
+        .property-card {
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+
+        .property-details {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+        }
+
+        /* Add subtle overlay to body */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.3);
+            z-index: -1;
+        }
+
+        /* Keep existing styles below */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Header styles */
+        header {
+            background-color:burlywood;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        /* Filter section styles */
+        .filters {
+            padding: 1rem;
+            background-color: #f4f4f4;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        /* Property grid styles */
+        .property-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .property-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .property-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .property-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .property-info {
+            padding: 1rem;
+        }
+
+        /* Property details page styles */
+        .property-details {
+            display: none;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-button {
+            background-color: #333;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        .details-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .details-content img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .details-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Properties List Page -->
+    <header>
+        <h1>Property Listings</h1>
+    </header>
+
+    <div class="filters">
+        <div class="filter-item">
+            <input type="text" id="search" placeholder="Search properties...">
+        </div>
+        <div class="filter-item">
+            <select id="type">
+                <option value="">All Types</option>
+                <option value="house">House</option>
+                <option value="apartment">Apartment</option>
+                <option value="villa">Villa</option>
+            </select>
+        </div>
+        <div class="filter-item">
+            <select id="price">
+                <option value="">Any Price</option>
+                <option value="1000000">Under ₹100,0000</option>
+                <option value="2500,0000">Under ₹2500,0000</option>
+                <option value="50000000">Under ₹500,00000</option>
+            </select>
+        </div>
+        <div class="filter-item">
+            <select id="rooms">
+                <option value="">Any Rooms</option>
+                <option value="1">1+ Rooms</option>
+                <option value="2">2+ Rooms</option>
+                <option value="3">3+ Rooms</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="property-grid" id="propertyGrid"></div>
+
+    <!-- Property Details Page -->
+    <div class="property-details" id="propertyDetails">
+        <button class="back-button" onclick="showListPage()">← Back to Listings</button>
+        <div class="details-content">
+            <img id="detailImage" src="" alt="Property Image">
+            <div>
+                <h2 id="detailTitle"></h2>
+                <p id="detailPrice"></p>
+                <p id="detailType"></p>
+                <p id="detailRooms"></p>
+                <p id="detailDescription"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample property data
+        const properties = [
+            {
+                id: 1,
+                title: "Peaceful 2BHK in Heart of Ahmedabad",
+                price: "₹250,0000",
+                type: "apartment",
+                rooms: 2,
+                image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRCymB5q6K2retovIxvHQS6dVWIj6cEE9S3ZOUXOG_0DbCWENYgK6dqvqAt4ZOA",
+                
+            },
+            {
+                id: 2,
+                title: "Elegant Flat Near Ganga Riverfront",
+                price: "₹950,00000",
+                type: "flat",
+                rooms: 5,
+                image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRbY7ngiRfzZclo6LCBGr_5Pa1W9LsorF9zMaUg-upK0SbFEW-NDXdbJxBKSHgU",
+                
+            },
+            {
+            id: 3,
+                title: "Vastu-Compliant Family Home in Pune",
+                price: "₹150,00000",
+                type: "house",
+                rooms: 2,
+                image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTTK3HnnoFm_4nAtrChfHcH0BEFpZ_xLAi9EJ0WrE1tB2qWLsw7m3IAS9Z4-ang",
+                
+            },
+            {
+                id: 4,
+                title: "Spacious Apartment with Temple View",
+                price: "₹250,0000",
+                type: "apartment",
+                rooms: 2,
+                image: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSfWZIsksLeJSpJWlL7ZolmTrMsS2qxf89SBiQEaEVkIHG85o7-G50wg-hRZltD",
+                
+            },
+            {
+                id: 5,
+                title: "Heritage-Style Flat in Jaipur City",
+                price: "₹20,0000",
+                type: "flat",
+                rooms: 2,
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSccUUOZjryAWmFR4k661TW8BC-fJFRp4z15bX3dsbW60fkmFHJXlp0PnVYJ34k",
+            
+                
+            },
+            {
+                id: 6,
+                title: "Luxurious Penthouse in South Delhi",
+                price: "₹250,0000",
+                type: "house",
+                rooms: 2,
+                image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSJ1CG2jEhBjzfR-l4zdZl_n4Py_e2imkKOhpcR1ii8NJZ5hQG_eXNn_rNbeaeN",
+                
+            },
+            {
+                id: 7,
+                title: "Serene Retreat Near Bengaluru IT Hub",
+                price: "₹20,0000",
+                type: "apartment",
+                rooms: 4,
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEUOLnKV8ENCTo76aLhUv7rwGheb147RUBnXriHh9tOZ3mbE3J3I8TEk3g6yRQ",
+                
+            },
+            {
+                id: 8,
+                title: "Modern Downtown Apartment",
+                price: "₹250,0000",
+                type: "apartment",
+                rooms: 3,
+                image: "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQ6uC2mn-8GO4m2QDooMjXuSKJHYG_4zoZB1cf0GHpErRbwmEfWapNioIg9X3Jt",
+                
+            },
+            {
+                id: 9,
+                title: "Budget-Friendly 1BHK Near Metro Station",
+                price: "₹50,0000",
+                type: "apartment",
+                rooms: 1,
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLuJomyDrZzJqrBp38o8a17svkShH9ZiCuCHR6nB6Lu1O0xWXnTuT-EosReMFH",
+                
+            },
+            {
+                 id: 10,
+                title: "Ready-to-Move Flat in Gated Chennai Society",
+                price: "₹250,0000",
+                type: "flat",
+                rooms: 3,
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAOFL2eYsL_CiOxAE_R0E7-_xjp7Rc--mrr48z4J7hg4wmWads-5vBp1QrBj8S",
+                
+            }
+            // Add more properties as needed
+        ];
+
+        // Initial render
+        renderProperties(properties);
+
+        // Filter elements
+        const searchInput = document.getElementById('search');
+        const typeFilter = document.getElementById('type');
+        const priceFilter = document.getElementById('price');
+        const roomsFilter = document.getElementById('rooms');
+
+        // Add event listeners for filters
+        [searchInput, typeFilter, priceFilter, roomsFilter].forEach(filter => {
+            filter.addEventListener('input', filterProperties);
+        });
+
+        function filterProperties() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const typeValue = typeFilter.value;
+            const priceValue = parseInt(priceFilter.value);
+            const roomsValue = parseInt(roomsFilter.value);
+
+            const filtered = properties.filter(property => {
+                return (
+                    property.title.toLowerCase().includes(searchTerm) &&
+                    (typeValue === "" || property.type === typeValue) &&
+                    (isNaN(priceValue) || parseInt(property.price.replace(/[^0-9]/g, '')) < priceValue) &&
+                    (isNaN(roomsValue) || property.rooms >= roomsValue)
+                );
+            });
+
+            renderProperties(filtered);
+        }
+
+        function renderProperties(properties) {
+            const grid = document.getElementById('propertyGrid');
+            grid.innerHTML = properties.map(property => `
+                <div class="property-card" onclick="showDetailPage(${property.id})">
+                    <img src="${property.image}" alt="${property.title}">
+                    <div class="property-info">
+                        <h3>${property.title}</h3>
+                        <p>${property.price}</p>
+                        <p>Type: ${property.type}</p>
+                        <p>Rooms: ${property.rooms}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showDetailPage(propertyId) {
+            const property = properties.find(p => p.id === propertyId);
+            document.getElementById('propertyGrid').style.display = 'none';
+            document.querySelector('.filters').style.display = 'none';
+            
+            const details = document.getElementById('propertyDetails');
+            details.style.display = 'block';
+            
+            document.getElementById('detailImage').src = property.image;
+            document.getElementById('detailTitle').textContent = property.title;
+            document.getElementById('detailPrice').textContent = property.price;
+            document.getElementById('detailType').textContent = `Type: ${property.type}`;
+            document.getElementById('detailRooms').textContent = `Rooms: ${property.rooms}`;
+            document.getElementById('detailDescription').textContent = property.description;
+        }
+
+        function showListPage() {
+            document.getElementById('propertyGrid').style.display = 'grid';
+            document.querySelector('.filters').style.display = 'flex';
+            document.getElementById('propertyDetails').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
